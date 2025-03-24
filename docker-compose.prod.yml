@@ -1,0 +1,28 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    image: recipe-api-prod:latest
+    container_name: recipe-api-prod
+    ports:
+      - "8000:8000"
+    environment:
+      DJANGO_SETTINGS_MODULE: myproject.settings
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    container_name: recipe-db-prod
+    environment:
+      POSTGRES_USER: django
+      POSTGRES_PASSWORD: django
+      POSTGRES_DB: recipe
+    ports:
+      - "5432:5432" # Default PostgreSQL port
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+
+volumes:
+  postgres_data_prod:
