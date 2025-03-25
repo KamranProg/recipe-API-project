@@ -25,7 +25,16 @@ jobs:
           POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
           DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
           DEBUG: ${{ secrets.DEBUG }}
-        run: docker compose -f docker-compose.dev.yml run --rm app python manage.py test
+        run: |
+          docker compose -f docker-compose.dev.yml run --rm \
+          -e POSTGRES_USER \
+          -e POSTGRES_PASSWORD \
+          -e POSTGRES_DB \
+          -e POSTGRES_HOST \
+          -e POSTGRES_PORT \
+          -e DJANGO_SETTINGS_MODULE \
+          -e DEBUG \
+          app python manage.py test
 
       - name: Run Lint (Development)
         env:
@@ -36,7 +45,16 @@ jobs:
           POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
           DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
           DEBUG: ${{ secrets.DEBUG }}
-        run: docker compose -f docker-compose.dev.yml run --rm app flake8 --config=/app/.flake8
+        run: |
+          docker compose -f docker-compose.dev.yml run --rm \
+          -e POSTGRES_USER \
+          -e POSTGRES_PASSWORD \
+          -e POSTGRES_DB \
+          -e POSTGRES_HOST \
+          -e POSTGRES_PORT \
+          -e DJANGO_SETTINGS_MODULE \
+          -e DEBUG \
+          app flake8 --config=/app/.flake8
 
   test-prod:
     name: Test (Production)
@@ -60,4 +78,13 @@ jobs:
           POSTGRES_PORT: ${{ secrets.PROD_POSTGRES_PORT }}
           DJANGO_SETTINGS_MODULE: ${{ secrets.PROD_DJANGO_SETTINGS_MODULE }}
           DEBUG: ${{ secrets.PROD_DEBUG }}
-        run: docker compose -f docker-compose.prod.yml run --rm app python manage.py test
+        run: |
+          docker compose -f docker-compose.prod.yml run --rm \
+          -e POSTGRES_USER \
+          -e POSTGRES_PASSWORD \
+          -e POSTGRES_DB \
+          -e POSTGRES_HOST \
+          -e POSTGRES_PORT \
+          -e DJANGO_SETTINGS_MODULE \
+          -e DEBUG \
+          app python manage.py test
