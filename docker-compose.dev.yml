@@ -7,8 +7,8 @@ services:
     container_name: recipe-api-dev
     ports:
       - "8000:8000"
-    environment:
-      DJANGO_SETTINGS_MODULE: app.settings
+    env_file:
+      - .env.dev
     volumes:
       - ./app:/app
       - ./requirements-dev.txt:/tmp/requirements-dev.txt
@@ -17,13 +17,8 @@ services:
 
   db:
     image: postgres:15
-    container_name: recipe-db-dev
-    environment:
-      POSTGRES_USER: django
-      POSTGRES_PASSWORD: django
-      POSTGRES_DB: recipe
-    ports:
-      - "5433:5432" # Map container's port 5432 to host's port 5433
+    env_file:
+      - .env.dev
     volumes:
       - postgres_data_dev:/var/lib/postgresql/data
 
