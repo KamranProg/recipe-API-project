@@ -35,14 +35,14 @@ jobs:
       - name: Build containers
         run: docker compose -f docker-compose.dev.yml build
 
-      - name: Run Tests (Development)
+      - name: Run App with Tests (including wait_for_db)
         run: |
-          docker compose -f docker-compose.dev.yml run --rm app sh -c "python manage.py wait_for_db && python manage.py test"
+          docker compose -f docker-compose.dev.yml up --abort-on-container-exit --exit-code-from app
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          POSTGRES_HOST: localhost
+          POSTGRES_HOST: db
           POSTGRES_PORT: 5432
           DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
           DEBUG: ${{ secrets.DEBUG }}
@@ -56,7 +56,7 @@ jobs:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          POSTGRES_HOST: localhost
+          POSTGRES_HOST: db
           POSTGRES_PORT: 5432
           DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
           DEBUG: ${{ secrets.DEBUG }}
