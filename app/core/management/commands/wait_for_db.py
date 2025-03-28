@@ -9,8 +9,8 @@ class Command(BaseCommand):
     help = "Waits for the database to become available before running further commands."
 
     def handle(self, *args, **options):
-        retries = int(os.environ.get("DB_WAIT_RETRIES", 30))
-        delay = float(os.environ.get("DB_WAIT_DELAY", 2.0))
+        retries = int(os.environ.get("DB_WAIT_RETRIES") or 30)
+        delay = float(os.environ.get("DB_WAIT_DELAY") or 2.0)
 
         self.stdout.write(
             f"Waiting for Postgres (retries: {retries}, delay: {delay}s)..."
