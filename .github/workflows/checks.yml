@@ -33,7 +33,6 @@ jobs:
 
       - name: Build containers
         run: docker compose -f docker-compose.dev.yml build
-
       - name: Run Tests (wait, migrate, test all apps)
         run: |
           docker compose -f docker-compose.dev.yml run --rm app sh -c "
