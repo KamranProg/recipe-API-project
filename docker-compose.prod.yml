@@ -21,6 +21,10 @@ services:
       DB_WAIT_RETRIES: ${DB_WAIT_RETRIES:-30}
       DB_WAIT_DELAY: ${DB_WAIT_DELAY:-2}
     restart: unless-stopped
+    command: >
+      sh -c "python manage.py wait_for_db &&
+             python manage.py migrate &&
+             gunicorn app.wsgi:application --bind 0.0.0.0:8000"
 
   db:
     image: postgres:15

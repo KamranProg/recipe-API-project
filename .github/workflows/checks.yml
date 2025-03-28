@@ -4,7 +4,6 @@ on: [push, pull_request]
 
 jobs:
   test-lint-dev:
-    name: Test and Lint (Development)
     runs-on: ubuntu-latest
 
     services:
@@ -35,28 +34,32 @@ jobs:
       - name: Build containers
         run: docker compose -f docker-compose.dev.yml build
 
-      - name: Run App with Tests (including wait_for_db)
+      - name: Run Tests (wait, migrate, test only)
         run: |
-          docker compose -f docker-compose.dev.yml up --abort-on-container-exit --exit-code-from app
+          docker compose -f docker-compose.dev.yml run --rm app sh -c "
+            python manage.py wait_for_db &&
+            python manage.py migrate &&
+            python manage.py test
+          "
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          POSTGRES_HOST: db
+          POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
           DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
           DEBUG: ${{ secrets.DEBUG }}
           DB_WAIT_RETRIES: 30
           DB_WAIT_DELAY: 2
 
-      - name: Run Lint (Development)
+      - name: Lint
         run: |
           docker compose -f docker-compose.dev.yml run --rm app flake8 --config=/app/.flake8
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          POSTGRES_HOST: db
+          POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
           DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
           DEBUG: ${{ secrets.DEBUG }}
