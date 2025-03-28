@@ -13,7 +13,7 @@ services:
     depends_on:
       - db
     environment:
-      PYTHONPATH: /app
+      PYTHONPATH: /app/app
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
@@ -21,8 +21,8 @@ services:
       POSTGRES_PORT: ${POSTGRES_PORT}
       DJANGO_SETTINGS_MODULE: ${DJANGO_SETTINGS_MODULE}
       DEBUG: ${DEBUG}
-      DB_WAIT_RETRIES: ${DB_WAIT_RETRIES}
-      DB_WAIT_DELAY: ${DB_WAIT_DELAY}
+      DB_WAIT_RETRIES: ${DB_WAIT_RETRIES:-30}
+      DB_WAIT_DELAY: ${DB_WAIT_DELAY:-2}
     command: >
       sh -c "python manage.py wait_for_db &&
              python manage.py migrate &&

@@ -10,7 +10,7 @@ services:
     depends_on:
       - db
     environment:
-      PYTHONPATH: /app
+      PYTHONPATH: /app/app
       POSTGRES_USER: ${PROD_POSTGRES_USER}
       POSTGRES_PASSWORD: ${PROD_POSTGRES_PASSWORD}
       POSTGRES_DB: ${PROD_POSTGRES_DB}
@@ -19,8 +19,8 @@ services:
       DJANGO_SETTINGS_MODULE: ${PROD_DJANGO_SETTINGS_MODULE}
       DEBUG: ${PROD_DEBUG}
       ALLOWED_HOSTS: ${PROD_ALLOWED_HOSTS}
-      DB_WAIT_RETRIES: ${DB_WAIT_RETRIES}
-      DB_WAIT_DELAY: ${DB_WAIT_DELAY}
+      DB_WAIT_RETRIES: ${DB_WAIT_RETRIES:-30}
+      DB_WAIT_DELAY: ${DB_WAIT_DELAY:-2}
     restart: unless-stopped
     command: >
       sh -c "python manage.py wait_for_db &&
@@ -41,7 +41,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "pg_isready -U $${PROD_POSTGRES_USER} -d $${PROD_POSTGRES_DB}",
+          "pg_isready -U ${PROD_POSTGRES_USER:-postgres} -d ${PROD_POSTGRES_DB:-postgres}",
         ]
       interval: 5s
       timeout: 5s
