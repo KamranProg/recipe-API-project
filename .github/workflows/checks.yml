@@ -40,7 +40,7 @@ jobs:
             cd /app &&
             python manage.py wait_for_db &&
             python manage.py migrate &&
-            python manage.py test
+            python -m unittest discover -s .
           "
         env:
           PYTHONPATH: /app
