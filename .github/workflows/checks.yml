@@ -33,6 +33,7 @@ jobs:
 
       - name: Build containers
         run: docker compose -f docker-compose.dev.yml build
+
       - name: Run Tests (wait, migrate, test all apps)
         run: |
           docker compose -f docker-compose.dev.yml run --rm app sh -c "
@@ -41,6 +42,7 @@ jobs:
             python manage.py test
           "
         env:
+          PYTHONPATH: /app
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
@@ -55,6 +57,7 @@ jobs:
         run: |
           docker compose -f docker-compose.dev.yml run --rm app flake8 --config=/app/.flake8
         env:
+          PYTHONPATH: /app
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}

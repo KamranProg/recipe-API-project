@@ -10,6 +10,7 @@ services:
     depends_on:
       - db
     environment:
+      PYTHONPATH: /app
       POSTGRES_USER: ${PROD_POSTGRES_USER}
       POSTGRES_PASSWORD: ${PROD_POSTGRES_PASSWORD}
       POSTGRES_DB: ${PROD_POSTGRES_DB}
@@ -37,7 +38,11 @@ services:
       POSTGRES_DB: ${PROD_POSTGRES_DB}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${PROD_POSTGRES_USER} -d ${PROD_POSTGRES_DB}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${PROD_POSTGRES_USER} -d $${PROD_POSTGRES_DB}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 5
