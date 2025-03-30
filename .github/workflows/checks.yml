@@ -34,13 +34,21 @@ jobs:
       - name: Build containers
         run: docker compose -f docker-compose.dev.yml build
 
+      - name: Debug Environment
+        run: |
+          docker compose -f docker-compose.dev.yml run --rm app sh -c "
+            echo 'PYTHONPATH: ' $PYTHONPATH &&
+            ls -R /app
+          "
+        env:
+          PYTHONPATH: /app
+
       - name: Run Tests (wait, migrate, test all apps)
         run: |
           docker compose -f docker-compose.dev.yml run --rm app sh -c "
-            cd /app &&
             python manage.py wait_for_db &&
             python manage.py migrate &&
-            python -m unittest discover -s .
+            python -m unittest discover -s app -p "test_*.py"
           "
         env:
           PYTHONPATH: /app
@@ -58,7 +66,6 @@ jobs:
         run: |
           docker compose -f docker-compose.dev.yml run --rm app flake8 --config=/app/.flake8
         env:
-          PYTHONPATH: /app
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
