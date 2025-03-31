@@ -18,6 +18,7 @@ help:
 	@echo "  make build-dev         - Build dev images"
 	@echo "  make build-prod        - Build prod images"
 	@echo "  make up-dev            - Start dev environment"
+	@echo "  make build-dev-nocache - Build dev images without cache"
 	@echo "  make up-prod           - Start prod environment"
 	@echo "  make shell-dev         - Shell into dev container"
 	@echo "  make shell-prod        - Shell into prod container"
@@ -58,6 +59,9 @@ resetdb-force:
 
 build-dev:
 	$(DOCKER_COMPOSE_DEV) build
+
+build-dev-nocache:
+	$(DOCKER_COMPOSE_DEV) build --no-cache
 
 up-dev:
 	$(DOCKER_COMPOSE_DEV) up
