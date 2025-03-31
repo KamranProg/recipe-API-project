@@ -32,23 +32,23 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build containers
-        run: docker compose -f docker-compose.dev.yml build
+        run: make build-dev
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_HOST: db
+          POSTGRES_PORT: 5432
+          DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
+          DEBUG: ${{ secrets.DEBUG }}
+          DB_WAIT_RETRIES: 30
+          DB_WAIT_DELAY: 2
 
       - name: Debug Environment
         run: |
           docker compose -f docker-compose.dev.yml run --rm app sh -c "
-            echo 'PYTHONPATH: ' $PYTHONPATH &&
+            echo 'PYTHONPATH: ' \$PYTHONPATH &&
             ls -R /app
-          "
-        env:
-          PYTHONPATH: /app
-
-      - name: Run Tests (wait, migrate, pytest)
-        run: |
-          docker compose -f docker-compose.dev.yml run --rm app sh -c "
-            python manage.py wait_for_db &&
-            python manage.py migrate &&
-            pytest -v --tb=short
           "
         env:
           PYTHONPATH: /app
@@ -62,9 +62,34 @@ jobs:
           DB_WAIT_RETRIES: 30
           DB_WAIT_DELAY: 2
 
-      - name: Lint
+      - name: Wait for DB + Migrate
         run: |
-          docker compose -f docker-compose.dev.yml run --rm app flake8 --config=/app/.flake8
+          make wait_for_db
+          make migrate
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_HOST: db
+          POSTGRES_PORT: 5432
+          DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
+          DEBUG: ${{ secrets.DEBUG }}
+          DB_WAIT_RETRIES: 30
+          DB_WAIT_DELAY: 2
+
+      - name: Lint
+        run: make lint
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_HOST: db
+          POSTGRES_PORT: 5432
+          DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
+          DEBUG: ${{ secrets.DEBUG }}
+
+      - name: Test
+        run: make test
         env:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
