@@ -25,10 +25,15 @@ help:
 	@echo "  make wait_for_db       - Wait for DB (dev)"
 	@echo "  make createsuperuser   - Create superuser (dev)"
 	@echo "  make resetdb           - Reset the database with confirmation (dev)"
+	@echo "  make resetdb-force     - Reset the database without confirmation (dev)"
 	@echo "  make test              - Run tests (dev)"
 	@echo "  make lint              - Run flake8 (dev)"
 	@echo "  make format            - Format code (black + isort) (dev)"
 	@echo "  make check             - Run lint + tests (pre-check) (dev)"
+	@echo "  make coverage          - Run tests with coverage report"
+	@echo "  make report            - Generate an HTML coverage report"
+	@echo "  make requirements      - Freeze pip requirements to requirements.txt"
+	@echo "  make clean             - Clean up .pyc and __pycache__ files"
 	@echo "  make down              - Stop dev containers"
 
 # -------------------------
@@ -78,6 +83,22 @@ format:
 check:
 	$(MAKE) lint
 	$(MAKE) test
+
+coverage:
+	$(APP_DEV) pytest --cov=./ --cov-report=term-missing
+
+report:
+	$(APP_DEV) pytest --cov=./ --cov-report=html && \
+	echo "✅ HTML coverage report generated at htmlcov/index.html"
+
+requirements:
+	$(APP_DEV) pip freeze > requirements.txt && \
+	echo "✅ requirements.txt updated"
+
+clean:
+	find . -name "*.pyc" -delete
+	find . -name "__pycache__" -type d -exec rm -r {} + && \
+	echo "✅ Cleaned up .pyc and __pycache__ files"
 
 down:
 	$(DOCKER_COMPOSE_DEV) down
